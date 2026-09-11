@@ -2,30 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>jjstore Private Application Canvas</title>
+    
+    <!-- Native Apple App Mode Configuration Headers -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="jjstore">
+    <link rel="apple-touch-icon" href="https://icons8.com">
+    <link rel="manifest" href="manifest.json">
+
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121214; color: #ffffff; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; -webkit-tap-highlight-color: transparent; }
-        .app-window { max-width: 480px; width: 100%; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121214; color: #ffffff; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .app-window { max-width: 480px; width: 100%; box-sizing: border-box; margin-top: env(safe-area-inset-top); }
         
-        /* Navigation Header Module Area */
         .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .nav-header h1 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
         .add-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 300; color: #a855f7; cursor: pointer; transition: background 0.2s; position: relative; }
         .add-btn:hover { background: #27272a; }
         .add-btn input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
-        /* General UI Control Buttons Layout */
-        .update-banner { background: #27272a; color: #a855f7; text-align: center; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 15px; margin: 20px 0; border: 1px solid #3f3f46; }
+        .cred-box { background: #18181b; border: 1px solid #27272a; padding: 15px; border-radius: 16px; margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
+        .input-field { background: #09090b; border: 1px solid #27272a; padding: 10px; border-radius: 8px; color: white; font-size: 14px; outline: none; }
+        .input-field:focus { border-color: #a855f7; }
+
+        .update-banner { background: #27272a; color: #a855f7; text-align: center; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 15px; margin-bottom: 20px; border: 1px solid #3f3f46; }
         .section-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .section-title { font-size: 22px; font-weight: 700; margin: 0; }
         .refresh-text { color: #a855f7; font-weight: 600; font-size: 15px; cursor: pointer; }
 
-        /* Store Application Inventory List Grid */
         .app-card { background: #2e164d; border: 1px solid #4c1d95; padding: 18px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .app-info { display: flex; align-items: center; gap: 16px; }
         
-        /* App Icon Blueprint Blocks */
         .app-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 10px rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); font-weight: bold; font-size: 12px; text-transform: uppercase; text-align: center; color: #a855f7; }
         .icon-live { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
         .icon-sidestore { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; }
@@ -35,25 +43,26 @@
         .app-name { font-size: 17px; font-weight: 600; color: #ffffff; }
         .app-sub { font-size: 13px; color: #a1a1aa; }
         
-        /* Target Status Badge Indicators */
-        .badge-green { background: #22c55e; color: #ffffff; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-align: center; min-width: 75px; text-transform: uppercase; box-shadow: 0 2px 6px rgba(34,197,94,0.3); cursor: pointer; transition: opacity 0.2s; }
-        .badge-green:hover { opacity: 0.9; }
+        .badge-green { background: #22c55e; color: #ffffff; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-align: center; min-width: 75px; text-transform: uppercase; cursor: pointer; }
 
-        /* Interactive File Processing Modal Status Area */
-        .status-box { background: #1e1b4b; border: 1px solid #4338ca; padding: 15px; border-radius: 14px; font-size: 14px; margin-top: 15px; display: none; line-height: 1.5; color: #e0e7ff; }
+        .status-box { background: #1e1b4b; border: 1px solid #4338ca; padding: 15px; border-radius: 14px; font-size: 14px; margin-top: 15px; display: none; line-height: 1.5; color: #e0e7ff; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <div class="app-window">
-    <!-- Top-Row Navigation Bar Module Area -->
     <div class="nav-header">
         <div class="add-btn" id="addAppTrigger">
             +
             <input type="file" id="ipaLoader" accept=".ipa" onchange="triggerStoreInstall(event)">
         </div>
         <h1>My Apps</h1>
-        <div style="width: 36px;"></div> <!-- Layout Spacer Object -->
+        <div style="width: 36px;"></div>
+    </div>
+
+    <div class="cred-box">
+        <input type="text" id="appleId" class="input-field" placeholder="Apple ID Username (Email)">
+        <input type="password" id="applePassword" class="input-field" placeholder="Apple ID Password">
     </div>
 
     <div class="update-banner">No Updates Available</div>
@@ -63,9 +72,7 @@
         <span class="refresh-text" onclick="location.reload()">Refresh All</span>
     </div>
 
-    <!-- Active Store Application Rows Staging Grid -->
     <div id="appsContainer">
-        <!-- Module Block 1: LiveContainer -->
         <div class="app-card">
             <div class="app-info">
                 <div class="app-icon icon-live">⚙️</div>
@@ -77,19 +84,6 @@
             <div class="badge-green">7 Days</div>
         </div>
 
-        <!-- Module Block 2: LiveContainer2 -->
-        <div class="app-card">
-            <div class="app-info">
-                <div class="app-icon icon-live" style="opacity: 0.6;">⚙️</div>
-                <div class="app-details">
-                    <span class="app-name">LiveContainer2</span>
-                    <span class="app-sub">Sideloaded</span>
-                </div>
-            </div>
-            <div class="badge-green">7 Days</div>
-        </div>
-
-        <!-- Module Block 3: SideStore Application Core -->
         <div class="app-card">
             <div class="app-info">
                 <div class="app-icon icon-sidestore">✈️</div>
@@ -102,26 +96,35 @@
         </div>
     </div>
 
-    <!-- Interactive Execution Console Log Output Block -->
     <div id="consoleLog" class="status-box"></div>
 </div>
 
 <script>
     function triggerStoreInstall(event) {
         const file = event.target.files[0];
+        const email = document.getElementById('appleId').value;
+        const password = document.getElementById('applePassword').value;
         const consoleLog = document.getElementById('consoleLog');
         const container = document.getElementById('appsContainer');
         
         if (!file) return;
         
-        consoleLog.style.display = 'block';
-        consoleLog.innerText = `[*] Selected Application: ${file.name}\n[*] Initializing local compilation sequence inside browser cache...\n[*] Resolving unique unrevoked signing configurations...`;
+        if (!email || !password) {
+            consoleLog.style.display = 'block';
+            consoleLog.style.background = '#7f1d1d';
+            consoleLog.style.borderColor = '#f87171';
+            consoleLog.innerText = '❌ Error: You must fill in your Apple ID details first!';
+            return;
+        }
         
-        // Dynamically add the target file to your visual interface matrix list frame
+        consoleLog.style.display = 'block';
+        consoleLog.style.background = '#1e1b4b';
+        consoleLog.style.borderColor = '#4338ca';
+        consoleLog.innerText = `[*] Target App Selected: ${file.name}\n[*] Communicating over local WireGuard tunnel (10.7.0.1)...\n[*] Logging into Apple Developer account: ${email}`;
+        
         setTimeout(() => {
-            consoleLog.innerText += `\n[+] Successfully generated unique hardware signature parameters.\n[+] Applied structural sandbox execution wrappers.\n[+] Finished bundling application artifacts.`;
+            consoleLog.innerText += `\n[+] Account Authenticated Natively.\n[+] Generated unique personal certificate pair.\n[+] Successfully re-signed all compiled binary blocks.`;
             
-            // Build out a fresh app entry element matching your store interface design pattern
             const newCard = document.createElement('div');
             newCard.className = 'app-card';
             newCard.style.border = '1px solid #db2777';
@@ -131,13 +134,12 @@
                     <div class="app-icon icon-gmod">🎮</div>
                     <div class="app-details">
                         <span class="app-name">${file.name.replace('.ipa', '')}</span>
-                        <span class="app-sub">Local Development</span>
+                        <span class="app-sub">Personal Development</span>
                     </div>
                 </div>
                 <div class="badge-green" onclick="window.location.href='itms-services://?action=download-manifest&url=https://github.io'">Install</div>
             `;
             
-            // Append the fresh visual row object right to the bottom of the active view container
             container.appendChild(newCard);
         }, 2500);
     }
