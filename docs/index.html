@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>jjstore Private Application Canvas</title>
     
-    <!-- Native Apple App Mode Configuration Headers -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="jjstore">
@@ -61,7 +60,7 @@
     </div>
 
     <div class="cred-box">
-        <input type="text" id="appleId" class="input-field" placeholder="Apple ID Username (Email)">
+        <input type="text" id="appleId" class="input-field" placeholder="Apple ID Username (Email)" value="zeyadmohamed20160@gmail.com">
         <input type="password" id="applePassword" class="input-field" placeholder="Apple ID Password">
     </div>
 
@@ -125,19 +124,62 @@
         setTimeout(() => {
             consoleLog.innerText += `\n[+] Account Authenticated Natively.\n[+] Generated unique personal certificate pair.\n[+] Successfully re-signed all compiled binary blocks.`;
             
+            const oldCustom = document.getElementById('customSignedRow');
+            if (oldCustom) oldCustom.remove();
+
             const newCard = document.createElement('div');
             newCard.className = 'app-card';
+            newCard.id = 'customSignedRow';
             newCard.style.border = '1px solid #db2777';
             newCard.style.background = '#4c0519';
+            
+            const cleanName = file.name.replace('.ipa', '');
+            
+            // Base64 configuration generation loop to bypass plist asset file requests
+            const manifestContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://apple.com">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>assets</key>
+			<array>
+				<dict>
+					<key>kind</key>
+					<string>software-package</string>
+					<key>url</key>
+					<string>https://github.io{file.name}</string>
+				</dict>
+			</array>
+			<key>metadata</key>
+			<dict>
+				<key>bundle-identifier</key>
+				<string>com.zezo.${cleanName.toLowerCase()}</string>
+				<key>bundle-version</key>
+				<string>1.0</string>
+				<key>kind</key>
+				<string>software</string>
+				<key>title</key>
+				<string>${cleanName}</string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>`;
+
+            const base64Manifest = btoa(unescape(encodeURIComponent(manifestContent)));
+            const dynamicItmsUrl = `itms-services://?action=download-manifest&url=data:text/xml;base64,${base64Manifest}`;
+
             newCard.innerHTML = `
                 <div class="app-info">
                     <div class="app-icon icon-gmod">🎮</div>
                     <div class="app-details">
-                        <span class="app-name">${file.name.replace('.ipa', '')}</span>
+                        <span class="app-name">${cleanName}</span>
                         <span class="app-sub">Personal Development</span>
                     </div>
                 </div>
-                <div class="badge-green" onclick="window.location.href='itms-services://?action=download-manifest&url=https://github.io'">Install</div>
+                <div class="badge-green" onclick="window.location.href='${dynamicItmsUrl}'">Install</div>
             `;
             
             container.appendChild(newCard);
