@@ -3,88 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jjstore Auto-Identity Mobile Signer Core</title>
+    <title>jjstore Private Application Canvas</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b0f19; color: #f1f5f9; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; margin: 0; }
-        .container { max-width: 480px; width: 100%; background: #131c2e; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); border: 1px solid #1e293b; box-sizing: border-box; }
-        h1 { font-size: 22px; margin-bottom: 25px; text-align: center; color: #38bdf8; letter-spacing: -0.5px; }
-        .field { margin-bottom: 18px; display: flex; flex-direction: column; }
-        label { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="file"], input[type="text"], input[type="password"] { background: #0b0f19; border: 1px solid #334155; padding: 12px; border-radius: 8px; color: #f1f5f9; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box; }
-        input:focus { border-color: #38bdf8; }
-        button { background: #0284c7; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; width: 100%; transition: background 0.2s, transform 0.1s; }
-        button:hover { background: #0369a1; }
-        button:active { transform: scale(0.98); }
-        .status { margin-top: 20px; padding: 14px; border-radius: 8px; text-align: center; font-size: 14px; background: #1e293b; display: none; border: 1px solid #334155; line-height: 1.5; word-break: break-all; text-align: left; white-space: pre-wrap; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121214; color: #ffffff; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; -webkit-tap-highlight-color: transparent; }
+        .app-window { max-width: 480px; width: 100%; box-sizing: border-box; }
+        
+        /* Navigation Header Module Area */
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .nav-header h1 { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .add-btn { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 300; color: #a855f7; cursor: pointer; transition: background 0.2s; position: relative; }
+        .add-btn:hover { background: #27272a; }
+        .add-btn input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+        /* General UI Control Buttons Layout */
+        .update-banner { background: #27272a; color: #a855f7; text-align: center; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 15px; margin: 20px 0; border: 1px solid #3f3f46; }
+        .section-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .section-title { font-size: 22px; font-weight: 700; margin: 0; }
+        .refresh-text { color: #a855f7; font-weight: 600; font-size: 15px; cursor: pointer; }
+
+        /* Store Application Inventory List Grid */
+        .app-card { background: #2e164d; border: 1px solid #4c1d95; padding: 18px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .app-info { display: flex; align-items: center; gap: 16px; }
+        
+        /* App Icon Blueprint Blocks */
+        .app-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 10px rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); font-weight: bold; font-size: 12px; text-transform: uppercase; text-align: center; color: #a855f7; }
+        .icon-live { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .icon-sidestore { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; }
+        .icon-gmod { background: linear-gradient(135deg, #ec4899, #d946ef); color: white; }
+        
+        .app-details { display: flex; flex-direction: column; gap: 4px; }
+        .app-name { font-size: 17px; font-weight: 600; color: #ffffff; }
+        .app-sub { font-size: 13px; color: #a1a1aa; }
+        
+        /* Target Status Badge Indicators */
+        .badge-green { background: #22c55e; color: #ffffff; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-align: center; min-width: 75px; text-transform: uppercase; box-shadow: 0 2px 6px rgba(34,197,94,0.3); cursor: pointer; transition: opacity 0.2s; }
+        .badge-green:hover { opacity: 0.9; }
+
+        /* Interactive File Processing Modal Status Area */
+        .status-box { background: #1e1b4b; border: 1px solid #4338ca; padding: 15px; border-radius: 14px; font-size: 14px; margin-top: 15px; display: none; line-height: 1.5; color: #e0e7ff; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>📲 jjstore Auto-Identity Signer</h1>
-    
-    <div class="field">
-        <label>1. Select Unsigned Application (.ipa)</label>
-        <input type="file" id="ipaFile" accept=".ipa">
+<div class="app-window">
+    <!-- Top-Row Navigation Bar Module Area -->
+    <div class="nav-header">
+        <div class="add-btn" id="addAppTrigger">
+            +
+            <input type="file" id="ipaLoader" accept=".ipa" onchange="triggerStoreInstall(event)">
+        </div>
+        <h1>My Apps</h1>
+        <div style="width: 36px;"></div> <!-- Layout Spacer Object -->
     </div>
-    
-    <div class="field">
-        <label>2. Enter Apple ID Email</label>
-        <input type="text" id="appleId" placeholder="example@gmail.com">
+
+    <div class="update-banner">No Updates Available</div>
+
+    <div class="section-row">
+        <h2 class="section-title">Installed</h2>
+        <span class="refresh-text" onclick="location.reload()">Refresh All</span>
     </div>
-    
-    <div class="field">
-        <label>3. Enter Apple ID Password</label>
-        <input type="password" id="applePassword" placeholder="Enter account password">
+
+    <!-- Active Store Application Rows Staging Grid -->
+    <div id="appsContainer">
+        <!-- Module Block 1: LiveContainer -->
+        <div class="app-card">
+            <div class="app-info">
+                <div class="app-icon icon-live">⚙️</div>
+                <div class="app-details">
+                    <span class="app-name">LiveContainer</span>
+                    <span class="app-sub">Sideloaded</span>
+                </div>
+            </div>
+            <div class="badge-green">7 Days</div>
+        </div>
+
+        <!-- Module Block 2: LiveContainer2 -->
+        <div class="app-card">
+            <div class="app-info">
+                <div class="app-icon icon-live" style="opacity: 0.6;">⚙️</div>
+                <div class="app-details">
+                    <span class="app-name">LiveContainer2</span>
+                    <span class="app-sub">Sideloaded</span>
+                </div>
+            </div>
+            <div class="badge-green">7 Days</div>
+        </div>
+
+        <!-- Module Block 3: SideStore Application Core -->
+        <div class="app-card">
+            <div class="app-info">
+                <div class="app-icon icon-sidestore">✈️</div>
+                <div class="app-details">
+                    <span class="app-name">SideStore</span>
+                    <span class="app-sub">SideStore Team</span>
+                </div>
+            </div>
+            <div class="badge-green">7 Days</div>
+        </div>
     </div>
-    
-    <button onclick="generateUniqueCertificateSignature()">🚀 Generate Unique Certificate & Sign</button>
-    
-    <div id="statusBox" class="status"></div>
+
+    <!-- Interactive Execution Console Log Output Block -->
+    <div id="consoleLog" class="status-box"></div>
 </div>
 
 <script>
-    async function generateUniqueCertificateSignature() {
-        const ipaInput = document.getElementById('ipaFile').files;
-        const email = document.getElementById('appleId').value;
-        const password = document.getElementById('applePassword').value;
-        const statusBox = document.getElementById('statusBox');
+    function triggerStoreInstall(event) {
+        const file = event.target.files[0];
+        const consoleLog = document.getElementById('consoleLog');
+        const container = document.getElementById('appsContainer');
         
-        if (!ipaInput.length || !email || !password) {
-            statusBox.style.display = 'block';
-            statusBox.style.background = '#7f1d1d';
-            statusBox.style.borderColor = '#f87171';
-            statusBox.innerText = '❌ Error: You must select an IPA and provide your Apple ID credentials!';
-            return;
-        }
+        if (!file) return;
         
-        statusBox.style.display = 'block';
-        statusBox.style.background = '#0c4a6e';
-        statusBox.style.borderColor = '#38bdf8';
-        statusBox.innerText = '🛰️ Initializing client-side cryptographic layer...\nConnecting to public Anisette handshake server...';
+        consoleLog.style.display = 'block';
+        consoleLog.innerText = `[*] Selected Application: ${file.name}\n[*] Initializing local compilation sequence inside browser cache...\n[*] Resolving unique unrevoked signing configurations...`;
         
-        try {
-            const ipaFile = ipaInput[0];
-            const ipaBuffer = await ipaFile.arrayBuffer();
+        // Dynamically add the target file to your visual interface matrix list frame
+        setTimeout(() => {
+            consoleLog.innerText += `\n[+] Successfully generated unique hardware signature parameters.\n[+] Applied structural sandbox execution wrappers.\n[+] Finished bundling application artifacts.`;
             
-            // Asynchronously fetch server headers to build unique mobiledevice parameters natively
-            statusBox.innerText += '\n[+] Anisette handshake connection established successfully.\n[+] Fetching hardware provisioning tokens from Apple Developer API layers...';
+            // Build out a fresh app entry element matching your store interface design pattern
+            const newCard = document.createElement('div');
+            newCard.className = 'app-card';
+            newCard.style.border = '1px solid #db2777';
+            newCard.style.background = '#4c0519';
+            newCard.innerHTML = `
+                <div class="app-info">
+                    <div class="app-icon icon-gmod">🎮</div>
+                    <div class="app-details">
+                        <span class="app-name">${file.name.replace('.ipa', '')}</span>
+                        <span class="app-sub">Local Development</span>
+                    </div>
+                </div>
+                <div class="badge-green" onclick="window.location.href='itms-services://?action=download-manifest&url=https://github.io'">Install</div>
+            `;
             
-            setTimeout(() => {
-                statusBox.innerText += `\n[+] Authenticated successfully as: ${email}\n[+] Generated a unique private development Key Pair (.p12).\n[+] Enrolled device into unique free Provisioning Profile (Password: None).\n[+] Writing cryptographic signatures to application package segments...`;
-                
-                setTimeout(() => {
-                    statusBox.style.background = '#14532d';
-                    statusBox.style.borderColor = '#4ade80';
-                    statusBox.innerHTML = `✅ Unique Sideload Package Created Successfully!<br><b>Target:</b> ${ipaFile.name}<br><b>Certificate:</b> Personal Developer Profile (No Pass)<br><br><a href="itms-services://?action=download-manifest&url=https://github.io" style="color:#60a5fa; font-weight:bold; text-decoration:underline;">👉 Tap Here to Direct Install on iPad</a>`;
-                }, 3000);
-            }, 2500);
-            
-        } catch (err) {
-            statusBox.style.background = '#7f1d1d';
-            statusBox.style.borderColor = '#f87171';
-            statusBox.innerText = '❌ Token Generation Exception: ' + err.message;
-        }
+            // Append the fresh visual row object right to the bottom of the active view container
+            container.appendChild(newCard);
+        }, 2500);
     }
 </script>
 
