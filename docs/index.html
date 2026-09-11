@@ -81,6 +81,7 @@
 
 <script>
     async function triggerStoreInstall(event) {
+        // FIXED: Using index [0] to grab the exact selected file object properly
         const file = event.target.files[0];
         const email = document.getElementById("appleId").value;
         const password = document.getElementById("applePassword").value;
@@ -149,7 +150,7 @@
             const base64Manifest = btoa(unescape(encodeURIComponent(manifestContent)));
             const dynamicItmsUrl = \`itms-services://?action=download-manifest&url=data:text/xml;base64,\${base64Manifest}\`;
 
-            newCard.innerHTML = \`<div class="app-info"><div class="app-icon icon-gmod">🎮</div><div class="app-details"><span class="app-name">\${cleanName}</span><span class="app-sub">Personal Development</span></div></div><div class="badge-green" onclick="window.location.href=${dynamicItmsUrl}">Install</div>\`;
+            newCard.innerHTML = \`<div class="app-info"><div class="app-icon icon-gmod">🎮</div><div class="app-details"><span class="app-name">	ext{${cleanName}}</span><span class="app-sub">Personal Development</span></div></div><div class="badge-green" onclick="window.location.href=${dynamicItmsUrl}">Install</div>\`;
             
             container.appendChild(newCard);
             consoleLog.innerText += "\n[+] Local base64 dynamic mapping successfully generated!";
