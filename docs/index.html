@@ -1,45 +1,71 @@
-<!-- Replace your current input boxes with this clean form template -->
-<form id="loginForm">
-    <input type="email" id="appleId" placeholder="Apple ID Email" required 
-           style="width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 5px;">
-    
-    <input type="password" id="applePassword" placeholder="Apple ID Password" required 
-           style="width: 100%; padding: 10px; margin-bottom: 15px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 5px;">
-    
-    <button type="submit" style="width: 100%; padding: 12px; background: #a855f7; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-        Generate Signing Files (.p12 & .mobileprovision)
-    </button>
-</form>
+<!-- Main Login Form Container -->
+<div class="login-container" style="max-width: 500px; margin: 0 auto; padding: 20px; background: #13111c; border-radius: 12px; border: 1px solid #251f38;">
+    <form id="appleLoginForm">
+        
+        <!-- Apple ID Field -->
+        <div class="input-group" style="margin-bottom: 15px; text-align: left;">
+            <label for="appleId" style="display: block; color: #a855f7; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Apple ID</label>
+            <input type="email" id="appleId" name="appleId" value="zeyadmohamed20160@gmail.com" required
+                   style="width: 100%; padding: 12px; background: #09070f; color: #ffffff; border: 1px solid #3b2d54; border-radius: 8px; font-size: 15px; outline: none; box-sizing: border-box;">
+        </div>
 
-<div id="statusMessage" style="margin-top: 15px; color: #a855f7; text-align: center;"></div>
+        <!-- Password Field -->
+        <div class="input-group" style="margin-bottom: 20px; text-align: left;">
+            <label for="applePassword" style="display: block; color: #a855f7; font-size: 14px; margin-bottom: 5px; font-weight: 500;">Apple ID Password</label>
+            <input type="password" id="applePassword" name="applePassword" placeholder="Enter your password" required
+                   style="width: 100%; padding: 12px; background: #09070f; color: #ffffff; border: 1px solid #3b2d54; border-radius: 8px; font-size: 15px; outline: none; box-sizing: border-box;">
+        </div>
+
+        <!-- Action Button -->
+        <button type="submit" id="submitBtn" 
+                style="width: 100%; padding: 14px; background: #a855f7; color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+            Generate Signing Files (.p12 & .mobileprovision)
+        </button>
+    </form>
+
+    <!-- Real-time Status Box -->
+    <div id="statusReport" style="margin-top: 15px; color: #b794f4; font-size: 14px; min-height: 20px;"></div>
+</div>
 
 <script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+document.getElementById('appleLoginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const status = document.getElementById('statusMessage');
-    status.innerText = "Connecting to Anisette Gateway and contacting Apple...";
     
-    const email = document.getElementById('appleId').value;
-    const password = document.getElementById('applePassword').value;
+    const statusBox = document.getElementById('statusReport');
+    const submitButton = document.getElementById('submitBtn');
     
+    const emailValue = document.getElementById('appleId').value;
+    const passwordValue = document.getElementById('applePassword').value;
+    
+    // UI Feedback Loop
+    statusBox.style.color = "#b794f4";
+    statusBox.innerText = "Connecting to Anisette proxy & initializing security parameters...";
+    submitButton.disabled = true;
+    submitButton.style.background = "#5b21b6";
+
     try {
-        // Sends the inputs straight to your local backend server
-        const response = await fetch('http://127.0.0', {
+        // Forwarding collected account parameters directly to your active backend engine
+        const gatewayResponse = await fetch('http://127.0.0', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, password: password })
+            body: JSON.stringify({ email: emailValue, password: passwordValue })
         });
         
-        if (response.ok) {
-            status.innerText = "Success! Your signing files are compiling for download.";
-            // Triggers a file download in the browser
-            window.location.href = 'http://127.0.0';
+        const resultMetadata = await gatewayResponse.json();
+        
+        if (gatewayResponse.ok) {
+            statusBox.style.color = "#4ade80";
+            statusBox.innerText = "Success! Verification token package synchronized.";
         } else {
-            const errData = await response.json();
-            status.innerText = "Error: " + errData.message;
+            statusBox.style.color = "#f87171";
+            statusBox.innerText = "Gateway Error: " + resultMetadata.message;
         }
-    } catch (err) {
-        status.innerText = "Failed to connect to backend engine.";
+    } catch (connectionError) {
+        statusBox.style.color = "#f87171";
+        statusBox.innerText = "Failed to establish path communication with local processing server.";
+    } finally {
+        submitButton.disabled = false;
+        submitButton.style.background = #a855f7;
     }
 });
 </script>
