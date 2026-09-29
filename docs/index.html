@@ -28,6 +28,9 @@
 </div>
 
 <script>
+// Change this string variable to your actual hosted backend domain url (e.g., https://render.com)
+const CLOUD_BACKEND_URL = "https://YOUR-LIVE-BACKEND-URL.com";
+
 document.getElementById('appleLoginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -39,33 +42,38 @@ document.getElementById('appleLoginForm').addEventListener('submit', async (e) =
     
     // UI Feedback Loop
     statusBox.style.color = "#b794f4";
-    statusBox.innerText = "Connecting to Anisette proxy & initializing security parameters...";
+    statusBox.innerText = "Contacting cloud engine and authenticating profiles...";
     submitButton.disabled = true;
     submitButton.style.background = "#5b21b6";
 
     try {
-        // Forwarding collected account parameters directly to your active backend engine
-        const gatewayResponse = await fetch('http://127.0.0', {
+        const response = await fetch(`${CLOUD_BACKEND_URL}/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: emailValue, password: passwordValue })
         });
         
-        const resultMetadata = await gatewayResponse.json();
+        const metadata = await response.json();
         
-        if (gatewayResponse.ok) {
+        if (response.ok) {
             statusBox.style.color = "#4ade80";
-            statusBox.innerText = "Success! Verification token package synchronized.";
+            statusBox.innerHTML = "<span>Files generated! Initiating download loop...</span>";
+            
+            // Triggers native iOS profile download popups sequentially inside Safari
+            window.open(`${CLOUD_BACKEND_URL}${metadata.download_p12}`, '_blank');
+            setTimeout(() => {
+                window.open(`${CLOUD_BACKEND_URL}${metadata.download_provision}`, '_blank');
+            }, 1000);
         } else {
             statusBox.style.color = "#f87171";
-            statusBox.innerText = "Gateway Error: " + resultMetadata.message;
+            statusBox.innerText = "Compilation Error: " + metadata.message;
         }
-    } catch (connectionError) {
+    } catch (err) {
         statusBox.style.color = "#f87171";
-        statusBox.innerText = "Failed to establish path communication with local processing server.";
+        statusBox.innerText = "Network Error: Could not establish a connection to your cloud engine.";
     } finally {
         submitButton.disabled = false;
-        submitButton.style.background = #a855f7;
+        submitButton.style.background = "#a855f7";
     }
 });
 </script>
